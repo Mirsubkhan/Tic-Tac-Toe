@@ -1,0 +1,149 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <conio.h>
+
+class TicTacToe {
+    std::vector<std::vector<std::string>> Field_3x3;
+    int row, col;
+    bool whoMove;
+    std::string player;
+public:
+
+    TicTacToe() {
+        row = 0; col = 0;
+        whoMove = false;
+        player = "Player 1\n";
+        Field_3x3.resize(3);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                Field_3x3[i].push_back("[]");
+            }
+        }
+    }
+
+    bool CheckWhoWin(std::string symbol) {
+        // Проверяем горизонтали
+        for (int i = 0; i < 3; i++) {
+            if (Field_3x3[i][0] == symbol && Field_3x3[i][1] == symbol && Field_3x3[i][2] == symbol) {
+                return true;
+            }
+        }
+        // Проверяем вертикали
+        for (int j = 0; j < 3; j++) {
+            if (Field_3x3[0][j] == symbol && Field_3x3[1][j] == symbol && Field_3x3[2][j] == symbol) {
+                return true;
+            }
+        }
+        // Проверяем диагонали
+        if (Field_3x3[0][0] == symbol && Field_3x3[1][1] == symbol && Field_3x3[2][2] == symbol ||
+            Field_3x3[0][2] == symbol && Field_3x3[1][1] == symbol && Field_3x3[2][0] == symbol) {
+            return true;
+        }
+        // Нет победителя
+        return false;
+    }
+
+    void PlayWithRobot() {
+        int count = 0;
+        while (true) {
+            print();
+            if (CheckWhoWin("X ")) { std::cout << "You Win!"; ClearField(); break; }
+            else if (CheckWhoWin("0 ")) { std::cout << "Robot Win!"; ClearField(); break; }
+            else if (!CheckWhoWin("0 ") && !CheckWhoWin("X ") && count == 9) { std::cout << "Draw!"; ClearField(); break; }
+            std::cout << player << "Row: "; std::cin >> row;
+            std::cout << "Col: "; std::cin >> col;
+            row = std::clamp(row, 0, 2);
+            col = std::clamp(col, 0, 2);
+            if (Field_3x3[row][col] == "[]") {
+                Field_3x3[row][col] = "X ";
+                row = rand() % 3;
+                col = rand() % 3;
+                count++;
+                if (count <= 8) {
+                    while (Field_3x3[row][col] != "[]") {
+                        row = rand() % 3;
+                        col = rand() % 3;
+                    }
+                    Field_3x3[row][col] = "0 ";
+                    count++;
+                }
+            }
+            else { std::cout << "this field is not empty!"; _getch(); }
+            system("cls");
+        }
+    }
+
+
+    void PlayWithFriend() {
+        int count = 0;
+        while (true) {
+            print();
+            if (CheckWhoWin("X ")) { std::cout << "Winner: player 1!"; ClearField(); break; }
+            else if (CheckWhoWin("0 ")) { std::cout << "Winner: player 2!"; ClearField(); break; }
+            else if (!CheckWhoWin("0 ") && !CheckWhoWin("X ") && count == 9){ std::cout << "Draw!"; ClearField(); break; }
+            std::cout << player << "Row: "; std::cin >> row;
+            std::cout << "Col: "; std::cin >> col;
+            row = std::clamp(row, 0, 2);
+            col = std::clamp(col, 0, 2);
+            if (!whoMove && Field_3x3[row][col] == "[]") {
+                Field_3x3[row][col] = "X "; 
+                player = "Player 1\n"; 
+                count++;
+                whoMove = true; 
+            }
+            else if(whoMove && Field_3x3[row][col] == "[]") { 
+                Field_3x3[row][col] = "0 "; 
+                player = "Player 1\n";
+                count++;
+                whoMove = false; 
+            }
+            else { std::cout << "this field is not empty!"; _getch(); }
+            system("cls");
+        }
+    }
+
+    void ClearField() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                Field_3x3[i][j] = "[]";
+            }
+        }
+    }
+
+    void print() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                std::cout << Field_3x3[i][j];
+                if (j != 2) { std::cout << "|"; }
+            }
+            std::cout << "\n--------\n";
+        }
+    }
+
+};
+
+int main()
+{
+    srand(time(0));
+    TicTacToe t;
+    int choice{0};
+    while (true) {
+        std::cout << "Choice the game mode:\n1 - Play with Friend\nAny Number - Play with Robot:";
+        std::cin >> choice;
+        switch (choice)
+        {
+        case 1:
+            t.PlayWithFriend();
+            std::cout << "\nPress Enter that play again.";
+            _getch();
+            break;
+        default:
+            t.PlayWithRobot();
+            std::cout << "\nPress Enter that play again.";
+            _getch();
+            break;
+        }
+    }
+}
